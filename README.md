@@ -1,4 +1,4 @@
 # Atividades-PythonDS
 Dupla:
-Nathan Rodrigues Damasceno
+Lucas De Comi Corte
 Levi Moreira Da Silveira
