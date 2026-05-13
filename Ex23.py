@@ -1,5 +1,5 @@
 alunos = []
-# nota = ("nota")
+mostrado = False
 def mostrarConceito(nota):
     if nota >= 7:
         return "Aprovado"
@@ -14,72 +14,70 @@ def mediaSala():
     media = notas / len(alunos)
     return media
 def mostrarAlunos():
-    aprovados = 0
-    recuperacao = 0
-    reprovados = 0
-    melhor = None
-    pior = None
-    for aluno in alunos:
-        conceito = mostrarConceito(aluno["nota"])
-        print("\nNome do aluno: ", aluno["nome"])
-        print("Nota final: ", aluno["nota"])
-        print("Conceito: ", conceito)
-        if conceito == "Aprovado":
-            aprovados += 1
-        elif conceito == "Recuperação":
-            recuperacao += 1
-        elif conceito == "Reprovado":
-            reprovados += 1
-        if melhor == None or aluno["nota"] > melhor["nota"]:
-            melhor = aluno
-        if pior == None or aluno["nota"] < pior["nota"]:
-            pior = aluno
-    print("\nMédia final da turma: ", mediaSala())
-    print("Quantidade de aprovados: ", aprovados)
-    print("Quantidade de alunos de recuperação: ", recuperacao)
-    print("Quantidade de reprovados: ", reprovados)
-    print("\nAluno com a maior nota: ", melhor["nome"])
-    print("Nota: ", melhor["nota"])
-    print("\nAluno com a menor nota: ", pior["nome"])
-    print("Nota: ", pior["nota"])
-def novoAlunoGen():
-    while True:
-        try:
-            nome = input("Insira o nome do aluno: ")
-            assert nome != "", "O nome não pode estar vazio!"
-            idade = int(input("Insira a idade do aluno: "))
-            assert idade >= 0, "A idade não pode ser negativa!"
-            nota = float(input("Insira a nota do aluno: "))
-            assert nota >= 0 and nota <= 10, "Insira uma nota entre 0 e 10!"
-            registro = {
-                "nome": nome,
-                "idade": idade,
-                "nota": nota
-            }
-            alunos.append(registro)
-            yield registro
-        except ValueError:
-            print("Insira um valor válido!")
-            yield "Valor inválido"
-        except AssertionError as e:
-            print(e)
-            yield e
-        except GeneratorExit:
-            mostrarAlunos()
-            raise
-
-novoAluno = novoAlunoGen()
+    global mostrado # Para não criar outra variável dentro da função, usamos isso como um identificador
+    if not mostrado:
+        aprovados = 0
+        recuperacao = 0
+        reprovados = 0
+        melhor = None
+        pior = None
+        for aluno in alunos:
+            conceito = mostrarConceito(aluno["nota"])
+            print("\nNome do aluno: ", aluno["nome"])
+            print("Nota final: ", aluno["nota"])
+            print("Conceito: ", conceito)
+            if conceito == "Aprovado":
+                aprovados += 1
+            elif conceito == "Recuperação":
+                recuperacao += 1
+            elif conceito == "Reprovado":
+                reprovados += 1
+            if melhor == None or aluno["nota"] > melhor["nota"]:
+                melhor = aluno
+            if pior == None or aluno["nota"] < pior["nota"]:
+                pior = aluno
+        print("\nMédia final da turma: ", mediaSala())
+        print("Quantidade de aprovados: ", aprovados)
+        print("Quantidade de alunos de recuperação: ", recuperacao)
+        print("Quantidade de reprovados: ", reprovados)
+        print("\nAluno com a maior nota: ", melhor["nome"])
+        print("Nota: ", melhor["nota"])
+        print("\nAluno com a menor nota: ", pior["nome"])
+        print("Nota: ", pior["nota"])
+        mostrado = True
+def cadastrarAluno():
+    try:
+        nome = input("Insira o nome do aluno: ")
+        if nome == "":
+            raise ValueError("O nome não pode estar vazio!")
+        idade = int(input("Insira a idade do aluno: "))
+        if idade < 0: 
+            raise ValueError("A idade não pode ser negativa!")
+        nota = float(input("Insira a nota do aluno: "))
+        if nota < 0 or nota > 10:
+            raise ValueError("Insira uma nota entre 0 e 10!")
+        registro = {
+            "nome": nome,
+            "idade": idade,
+            "nota": nota
+        }
+        alunos.append(registro)
+    except ValueError as e:
+        print(e)
+        cadastrarAluno()
 try:
-    next(novoAluno)
+    cadastrarAluno()
     while True:
         continuar = input("Deseja cadastrar outro aluno? (S/N) ")
         if(continuar.lower() == "s"):
-            next(novoAluno)
+            cadastrarAluno()
         else:
-            novoAluno.close()
+            mostrarAlunos()
             break
+except KeyboardInterrupt:
+    print("\nFinalizando o programa...")
+    if len(alunos) > 0:
+        mostrarAlunos()
 except StopIteration:
     if len(alunos) > 0:
         mostrarAlunos()
-except KeyboardInterrupt:
-    print("\nFinalizando o programa...")
